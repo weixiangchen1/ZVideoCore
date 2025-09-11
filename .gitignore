@@ -55,3 +55,4 @@
 *.cbt
 Debug
 Release
+.vs
