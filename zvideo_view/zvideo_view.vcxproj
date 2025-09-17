@@ -111,6 +111,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="utils.h" />
     <ClInclude Include="zsdlview.h" />
     <ClInclude Include="zvideoview.h" />
   </ItemGroup>

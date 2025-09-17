@@ -58,6 +58,9 @@ public:
     // 绘制AVFrame数据
     bool DrawFrame(AVFrame* pFrame);
 
+    // 获取帧率
+    int GetRenderFps();
+
 protected:
     int m_iWidth = 0;                           // 窗口宽度
     int m_iHeight = 0;                          // 窗口高度
@@ -65,4 +68,7 @@ protected:
     std::mutex m_mutex;                         // 互斥锁
     int m_iScaleWidth = 0;                      // 缩放宽度
     int m_iScaleHeight = 0;                     // 缩放高度
+    int m_iFps = 0;                             // 帧率
+    long long m_lBeginMs = 0;                   // 计时开始时间
+    int m_iCount = 0;
 };
