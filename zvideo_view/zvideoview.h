@@ -3,6 +3,7 @@
 
 // 视频渲染接口类
 // 1.隐藏SDL实现 2.渲染方案可替代 3.线程安全
+struct AVFrame;
 class ZVideoView {
 public:
     enum class VideoFormat {
@@ -35,6 +36,16 @@ public:
     // @return 是否渲染成功
     virtual bool Draw(const unsigned char* pData, int iLineSize = 0) = 0;
 
+    /////////////////////////////////////////////////////////
+    // 渲染YUV格式图像 (线程安全)
+    // @para pYData 指向Y分量数据的指针 iYPitch 表示Y平面中每行的字节数（stride）
+    // @para pUData 指向U分量数据的指针 iUPitch 表示U平面中每行的字节数（stride）
+    // @para pVData 指向V分量数据的指针 iVPitch 表示V平面中每行的字节数（stride）
+    // @return 是否渲染成功
+    virtual bool Draw(const unsigned char* pYData, int iYPitch,
+                      const unsigned char* pUData, int iUPitch,
+                      const unsigned char* pVData, int iVPitch) = 0;
+
     // 清理申请的资源
     virtual void Close() = 0;
 
@@ -43,6 +54,9 @@ public:
 
     // 设置缩放尺寸
     void Scale(int iScaleWidth, int iScaleHeight);
+
+    // 绘制AVFrame数据
+    bool DrawFrame(AVFrame* pFrame);
 
 protected:
     int m_iWidth = 0;                           // 窗口宽度

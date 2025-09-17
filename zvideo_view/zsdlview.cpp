@@ -138,6 +138,46 @@ bool ZSDLView::Draw(const unsigned char* pData, int iLineSize) {
     return true;
 }
 
+bool ZSDLView::Draw(const unsigned char* pYData, int iYPitch, 
+                    const unsigned char* pUData, int iUPitch, 
+                    const unsigned char* pVData, int iVPitch) {
+    // 参数检查
+    if (pYData == nullptr || pUData == nullptr || pVData == nullptr) {
+        return false;
+    }
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (m_pSrceen == nullptr || m_pRenderer == nullptr || m_pTexture == nullptr ||
+        m_iWidth <= 0 || m_iHeight <= 0) {
+        return false;
+    }
+
+    // 更新材质 复制内存数据到显存
+    if (SDL_UpdateYUVTexture(m_pTexture, nullptr, pYData, iYPitch, pUData, iUPitch, pVData, iVPitch) != 0) {
+        std::cerr << "SDL_UpdateTexture error: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    // 清空屏幕
+    SDL_RenderClear(m_pRenderer);
+
+    // 材质复制到渲染器
+    SDL_Rect destRect, * pDestRect = nullptr;
+    if (m_iScaleWidth > 0 && m_iScaleHeight > 0) {
+        destRect.x = 0; destRect.y = 0;
+        destRect.w = m_iScaleWidth;
+        destRect.h = m_iScaleHeight;
+        pDestRect = &destRect;
+    }
+
+    if (SDL_RenderCopy(m_pRenderer, m_pTexture, nullptr, pDestRect) != 0) {
+        std::cerr << "SDL_RenderCopy error: " << SDL_GetError() << std::endl;
+        return false;
+    }
+    SDL_RenderPresent(m_pRenderer);
+
+    return true;
+}
+
 void ZSDLView::Close() {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_pTexture != nullptr) {

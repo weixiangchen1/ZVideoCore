@@ -5,6 +5,7 @@
 #include <fstream>
 
 class ZVideoView;
+struct AVFrame;
 class ZVideoViewTest : public QWidget {
     Q_OBJECT
 
@@ -22,6 +23,7 @@ private:
     int m_iHeight;
     std::ifstream m_file;
     ZVideoView* m_pVideoView;
-    unsigned char* m_pData;
+    //unsigned char* m_pData;
+    AVFrame* m_pFrame;
 };
 
