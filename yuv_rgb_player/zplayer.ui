@@ -1,26 +1,382 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UI version="4.0" >
+<ui version="4.0">
  <class>ZPlayerClass</class>
- <widget class="QWidget" name="ZPlayerClass" >
-  <property name="objectName" >
-   <string notr="true">ZPlayerClass</string>
-  </property>
-  <property name="geometry" >
+ <widget class="QWidget" name="ZPlayerClass">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>982</width>
+    <height>458</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>ZPlayer</string>
-  </property>$centralwidget$
+  </property>
+  <widget class="QLabel" name="videoLabel1">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>471</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(220, 220, 220);</string>
+   </property>
+   <property name="text">
+    <string>video1</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="videoLabel2">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>10</y>
+     <width>471</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(220, 220, 220);</string>
+   </property>
+   <property name="text">
+    <string>video2</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="openFileBtn1">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>360</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>打开文件</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="formatCombo1">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>360</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>RGB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>RGBA</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>ARGB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>BGRA</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>YUV420P</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QSpinBox" name="fpsSpinBox1">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>360</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>200</number>
+   </property>
+   <property name="value">
+    <number>25</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>370</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>像素格式：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>370</y>
+     <width>41</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>帧率：</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="fpsSpinBox2">
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>360</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>200</number>
+   </property>
+   <property name="value">
+    <number>25</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="openFileBtn2">
+   <property name="geometry">
+    <rect>
+     <x>870</x>
+     <y>360</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>打开文件</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="formatCombo2">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>360</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>RGB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>RGBA</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>ARGB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>BGRA</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>YUV420P</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>370</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>帧率：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>370</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>像素格式：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>410</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>宽度：</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="widthSpinBox1">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>400</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>400</number>
+   </property>
+   <property name="maximum">
+    <number>1920</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="heightSpinBox1">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>400</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>300</number>
+   </property>
+   <property name="maximum">
+    <number>1080</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>410</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>高度：</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="widthSpinBox2">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>400</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>400</number>
+   </property>
+   <property name="maximum">
+    <number>1920</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>410</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>宽度：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>410</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>高度：</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="heightSpinBox2">
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>400</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>300</number>
+   </property>
+   <property name="maximum">
+    <number>1080</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="fpsLabel1">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>410</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent;</string>
+   </property>
+   <property name="text">
+    <string>fps:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="fpsLabel2">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>410</y>
+     <width>54</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent;</string>
+   </property>
+   <property name="text">
+    <string>fps:</string>
+   </property>
+  </widget>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources>
-   <include location="zplayer.qrc"/>
+  <include location="zplayer.qrc"/>
  </resources>
  <connections/>
-</UI>
+</ui>

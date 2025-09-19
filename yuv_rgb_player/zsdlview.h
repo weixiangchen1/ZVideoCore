@@ -12,9 +12,8 @@ public:
     // @para iWidth 窗口宽度
     // @para iHeight 窗口高度
     // @para eFormat 渲染格式
-    // @para pWinId 窗口句柄，如果为空创建新窗口
     // @return 是否初始化创建成功
-    bool Init(int iWidth, int iHeight, VideoFormat eFormat = VideoFormat::RGBA, void* pWinId = nullptr) override;
+    bool Init(int iWidth, int iHeight, VideoFormat eFormat = VideoFormat::RGBA) override;
 
     ////////////////////////////////////////////////////////////////////////
     // 渲染图像 (线程安全)

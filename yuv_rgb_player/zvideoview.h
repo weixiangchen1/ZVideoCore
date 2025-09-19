@@ -1,15 +1,19 @@
 #pragma once
 #include <mutex>
+#include <fstream>
 
 // 视频渲染接口类
 // 1.隐藏SDL实现 2.渲染方案可替代 3.线程安全
 struct AVFrame;
 class ZVideoView {
 public:
+    // VideoFormat枚举值与ffmpeg的AVPixelFormat一致
     enum class VideoFormat {
-        RGBA = 0,
-        ARGB,     
-        YUV420P,
+        YUV420P = 0,
+        RGB = 2,
+        ARGB = 25,
+        RGBA = 26,
+        BGRA = 28,
         UNSUPPORT_FORMAT = -1
     };
 
@@ -24,9 +28,8 @@ public:
     // @para iWidth 窗口宽度
     // @para iHeight 窗口高度
     // @para eFormat 渲染格式
-    // @para pWinId 窗口句柄，如果为空创建新窗口
     // @return 是否初始化创建成功
-    virtual bool Init(int iWidth, int iHeight, VideoFormat eFormat = VideoFormat::RGBA, void* pWinId = nullptr) = 0;
+    virtual bool Init(int iWidth, int iHeight, VideoFormat eFormat = VideoFormat::RGBA) = 0;
 
     /////////////////////////////////////////////////////////
     // 渲染图像 (线程安全)
@@ -61,7 +64,17 @@ public:
     // 获取帧率
     int GetRenderFps();
 
+    // 打开文件
+    bool OpenFile(std::string strFile);
+
+    // 读取一帧数据
+    AVFrame* ReadFrame();
+
+    // 设置窗口句柄
+    void SetWindow(void* pWindow);
+
 protected:
+    void* m_pWindow = nullptr;                  // 窗口句柄
     int m_iWidth = 0;                           // 窗口宽度
     int m_iHeight = 0;                          // 窗口高度
     VideoFormat m_eFormat = VideoFormat::RGBA;  // 像素格式
@@ -71,4 +84,8 @@ protected:
     int m_iFps = 0;                             // 帧率
     long long m_lBeginMs = 0;                   // 计时开始时间
     int m_iCount = 0;
+
+private:
+    std::ifstream m_file;
+    AVFrame* m_pFrame = nullptr;
 };
