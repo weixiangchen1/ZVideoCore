@@ -46,10 +46,43 @@ int main(int argc, char* argv[]) {
     pCodecCtx->time_base = { 1, 25 };           // 帧时间戳的时间单位 pts*time_base=当前播放时间
     pCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;    // 指定源数据像素格式，与编码算法相关
     pCodecCtx->thread_count = 16;               // 编码线程数
-    pCodecCtx->max_b_frames = 0;                // b帧为0，延时降低，数据量变大
-    // 预设编码器参数
-    av_opt_set(pCodecCtx->priv_data, "preset", "ultrafast", 0);         // 最快速度
-    av_opt_set(pCodecCtx->priv_data, "tune", "zerolatency", 0);         // 0延时
+    //pCodecCtx->max_b_frames = 0;                // b帧为0，延时降低，数据量变大
+    //// 预设编码器参数
+    //av_opt_set(pCodecCtx->priv_data, "preset", "ultrafast", 0);         // 最快速度
+    //av_opt_set(pCodecCtx->priv_data, "tune", "zerolatency", 0);         // 0延时
+
+    //////////////////////////////////////////
+    // ABR 平均比特率
+    // int iBitrate = 400000;
+    // pCodecCtx->bit_rate = iBitrate;
+
+    //////////////////////////////////////////
+    // CQP 恒定质量
+    // H.264中QP范围在0-51
+    // x264 默认23 效果较好18
+    // x265 默认28 效果较好25
+    // av_opt_set_int(pCodecCtx->priv_data, "qp", 51, 0);
+
+    //////////////////////////////////////////
+    // CBR 恒定比特率
+    // 输出文件需要是.ts（MPEG-2 TS），因为MP4不支持NAL填充。
+    // int iBitrate = 400000;
+    // pCodecCtx->rc_min_rate = iBitrate;
+    // pCodecCtx->rc_max_rate = iBitrate;
+    // pCodecCtx->rc_buffer_size = iBitrate * 2;
+    // pCodecCtx->bit_rate = iBitrate;
+    // av_opt_set(pCodecCtx->priv_data, "nal-hrd", "cbr", 0);
+
+    //////////////////////////////////////////
+    // CRF 恒定速率因子
+    // av_opt_set_int(pCodecCtx->priv_data, "crf", 23, 0);
+
+    //////////////////////////////////////////
+    // VBV 约束编码
+    // av_opt_set_int(pCodecCtx->priv_data, "crf", 23, 0);
+    // int iBitrate = 400000;
+    // pCodecCtx->rc_max_rate = iBitrate;
+    // pCodecCtx->rc_buffer_size = iBitrate * 2;
 
     // 4.打开编码上下文
     int iRet = avcodec_open2(pCodecCtx, pCodec, NULL);
