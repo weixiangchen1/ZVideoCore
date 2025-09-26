@@ -24,7 +24,7 @@ public:
             }
         }
     }
-
+    
     static long long GetCurrentTimestamp() {
         return clock() / (CLOCKS_PER_SEC / 1000);
     }
