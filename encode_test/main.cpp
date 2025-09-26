@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) {
     pCodecCtx->time_base = { 1, 25 };           // 帧时间戳的时间单位 pts*time_base=当前播放时间
     pCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;    // 指定源数据像素格式，与编码算法相关
     pCodecCtx->thread_count = 16;               // 编码线程数
+    pCodecCtx->gop_size = 6;                    // 一个GOP包含一个IDR、一个SPS、一个PPS
     //pCodecCtx->max_b_frames = 0;                // b帧为0，延时降低，数据量变大
     //// 预设编码器参数
     //av_opt_set(pCodecCtx->priv_data, "preset", "ultrafast", 0);         // 最快速度
@@ -147,11 +148,34 @@ int main(int argc, char* argv[]) {
                 std::cerr << strErr << std::endl;
                 break;
             }
-            std::cout << pPacket->size << " " << std::flush;
+
+            // 分析NALU
+            // 一个AVPacket可能包含多个NALU，以0001或001分隔
+            // NALU = [start code](0001) + [NALU header]
+            // NALU header = forbidden_zero_bit(1bit) +   // 初始为0，当网络发现NAL单元有比特错误时可设置该比特为1
+            //               nal_ref_idc(2bit) +          // 优先级
+            //               nal_unit_type(5bit)          // NALU类型 (5:IDR, 7:序列参数集(SPS), 8:图像参数集(PPS)) 
+            int nal_unit_type = 0;
+            unsigned char nal_head = *(pPacket->data + 4);
+            nal_unit_type = nal_head & 0x1f;        // 取后五位 0001 1111
+            std::cout << nal_unit_type << " " << std::flush;
+            // Packet包含多个NALU
+            for (int i = 4; i < pPacket->size - 4; ++i) {
+                //遍历寻找[start code] 001
+                if (pPacket->data[i] == 0 &&
+                    pPacket->data[i + 1] == 0 &&
+                    pPacket->data[i + 2] == 1) {
+                    nal_unit_type = pPacket->data[i + 3] & 0x1f;
+                    std::cout << "(" << nal_unit_type << ") " << std::flush;
+                }
+            }
+
+            // std::cout << pPacket->size << " " << std::flush;
             file.write((char*)pPacket->data, pPacket->size);
             av_packet_unref(pPacket);
         }
     }
+    std::cout << std::endl;
 
     av_frame_free(&pFrame);
     av_packet_free(&pPacket);
