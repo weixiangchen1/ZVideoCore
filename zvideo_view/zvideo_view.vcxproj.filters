@@ -46,6 +46,9 @@
     <ClCompile Include="zsdlview.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zencode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zvideoview.h">
@@ -55,6 +58,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zencode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

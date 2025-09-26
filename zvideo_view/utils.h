@@ -2,6 +2,16 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#ifndef LINUX_VERSION
+#include "Windows.h"
+#else
+#include "unistd.h"
+#include "sys/sysinfo.h"
+#endif
+extern "C" {
+#include "libavcodec/avcodec.h"
+#include "libavutil/opt.h"
+}
 
 class Utils {
 public:
@@ -13,6 +23,22 @@ public:
                 break;
             }
         }
+    }
+
+    static int GetSystemCPUNum() {
+#ifndef LINUX_VERSION
+        SYSTEM_INFO sysInfo;
+        GetSystemInfo(&sysInfo);
+        return sysInfo.dwNumberOfProcessors;
+#else
+        return sysconf(_SC_NPROCS_ONLN);
+#endif
+    }
+
+    static std::string GetAVErrorMessage(int iErrorId) {
+        char strMsg[1024] = { 0 };
+        av_strerror(iErrorId, strMsg, sizeof(strMsg) - 1);
+        return std::string(strMsg);
     }
 };
 
