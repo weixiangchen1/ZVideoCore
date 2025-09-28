@@ -11,6 +11,7 @@ public:
     enum class VideoFormat {
         YUV420P = 0,
         RGB = 2,
+        NV12 = 23,
         ARGB = 25,
         RGBA = 26,
         BGRA = 28,
@@ -21,6 +22,8 @@ public:
         SDL = 0
     };
 public:
+    virtual ~ZVideoView();
+
     static ZVideoView* CreateVideoView(RenderType eType = RenderType::SDL);
 
     /////////////////////////////////////////////////////////
@@ -88,4 +91,5 @@ protected:
 private:
     std::ifstream m_file;
     AVFrame* m_pFrame = nullptr;
+    unsigned char* m_pCacheBuf = nullptr;       // 用于复制NV12的缓冲区
 };

@@ -24,10 +24,28 @@ int main(int argc, char* argv[]) {
     AVCodecID codeId = AV_CODEC_ID_H264;
     AVCodec* pCodec = avcodec_find_decoder(codeId);
     AVCodecContext* pCodecCtx = avcodec_alloc_context3(pCodec);
+
+    AVHWDeviceType hwType = AV_HWDEVICE_TYPE_DXVA2;
+    // 支持的硬件加速方式
+    for (int i = 0; ; i++) {
+        const AVCodecHWConfig* pCodecHW = avcodec_get_hw_config(pCodec, i);
+        if (pCodecHW == nullptr) {
+            break;
+        }
+        if (pCodecHW->device_type) {
+            std::cout << av_hwdevice_get_type_name(pCodecHW->device_type) << std::endl;
+        }
+    }
+    // 初始化硬件加速上下文
+    AVBufferRef* pHWCtx = nullptr;
+    av_hwdevice_ctx_create(&pHWCtx, hwType, nullptr, nullptr, 0);
+    pCodecCtx->hw_device_ctx = av_buffer_ref(pHWCtx);
+
     avcodec_open2(pCodecCtx, nullptr, nullptr);
     AVCodecParserContext* pCodecPCtx = av_parser_init(codeId);
     AVPacket* pPacket = av_packet_alloc();
     AVFrame* pFrame = av_frame_alloc();
+    AVFrame* pHWFrame = av_frame_alloc();       // 用于硬解码转换
     long long lBeginTime = Utils::GetCurrentTimestamp();
     int iCount = 0;
     bool isInit = false;
@@ -64,13 +82,22 @@ int main(int argc, char* argv[]) {
                     if (iRet < 0) {
                         break;
                     }
+                    AVFrame* pShowFrame = pFrame;
+                    // 硬件加速返回的数据格式为AV_PIX_FMT_DXVA2_VLD
+                    if (pCodecCtx->hw_device_ctx) {
+                        // 硬解码转换 GPU->CPU 显存复制到内存
+                        // av_hwframe_transfer_data处理后格式变为AV_PIX_FMT_NV12
+                        av_hwframe_transfer_data(pHWFrame, pFrame, 0);
+                        pShowFrame = pHWFrame;
+                    }
                     std::cout << pFrame->format << " " << std::flush;
+                    std::cout << pHWFrame->format << " " << std::flush;
                     // 第一帧初始化窗口
                     if (!isInit) {
-                        pVideoView->Init(pFrame->width, pFrame->height, (ZVideoView::VideoFormat)pFrame->format);
+                        pVideoView->Init(pShowFrame->width, pShowFrame->height, (ZVideoView::VideoFormat)pShowFrame->format);
                         isInit = true;
                     }
-                    pVideoView->DrawFrame(pFrame);
+                    pVideoView->DrawFrame(pShowFrame);
                     iCount++;
                     long long lEndTime = Utils::GetCurrentTimestamp();
                     if (lEndTime - lBeginTime >= 100) {

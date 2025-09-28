@@ -6,6 +6,13 @@ extern "C" {
 }
 #pragma comment(lib, "avutil.lib")
 
+ZVideoView::~ZVideoView() {
+	if (m_pCacheBuf != nullptr) {
+		delete m_pCacheBuf;
+		m_pCacheBuf = nullptr;
+	}
+}
+
 ZVideoView* ZVideoView::CreateVideoView(RenderType eType) {
 	switch (eType) {
 	case ZVideoView::RenderType::SDL:
@@ -34,6 +41,34 @@ bool ZVideoView::DrawFrame(AVFrame* pFrame) {
 		return Draw(pFrame->data[0], pFrame->linesize[0],
 					pFrame->data[1], pFrame->linesize[1], 
 					pFrame->data[2], pFrame->linesize[2]);
+	case AV_PIX_FMT_NV12: {
+		// pFrame->data[0] + pFrame->data[1]
+		if (m_pCacheBuf == nullptr) {
+			m_pCacheBuf = new unsigned char[4096 * 2160 * 1.5];
+		}
+		int iLineSize = pFrame->width;
+		if (pFrame->linesize[0] == pFrame->width) {
+			memcpy(m_pCacheBuf, pFrame->data[0], pFrame->linesize[0] * pFrame->height);
+			memcpy(m_pCacheBuf + pFrame->linesize[0] * pFrame->height,
+				pFrame->data[1], pFrame->linesize[1] * pFrame->height / 2);
+		} else {
+			// 由于对齐问题 需要逐行进行复制 舍弃对齐的数据
+			// 逐行复制Y数据
+			for (int i = 0; i < pFrame->height; ++i) {
+				memcpy(m_pCacheBuf + i * pFrame->width,
+					pFrame->data[0] + i * pFrame->linesize[0],
+					pFrame->width);
+			}
+			// 逐行复制UV数据
+			unsigned char* pOffsetY = m_pCacheBuf + pFrame->height * pFrame->width;
+			for (int i = 0; i < pFrame->height / 2; ++i) {
+				memcpy(pOffsetY + i * pFrame->width,
+					pFrame->data[1] + i * pFrame->linesize[1],
+					pFrame->width);
+			}
+		}
+		return Draw(m_pCacheBuf, iLineSize);
+	}
 	case AV_PIX_FMT_BGRA:
 	case AV_PIX_FMT_RGBA:
 	case AV_PIX_FMT_ARGB:

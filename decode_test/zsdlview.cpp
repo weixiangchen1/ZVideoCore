@@ -70,6 +70,9 @@ bool ZSDLView::Init(int iWidth, int iHeight, VideoFormat eFormat) {
     case ZVideoView::VideoFormat::YUV420P:
         iFormat = SDL_PIXELFORMAT_IYUV;
         break;
+    case ZVideoView::VideoFormat::NV12:
+        iFormat = SDL_PIXELFORMAT_NV12;
+        break;
     case ZVideoView::VideoFormat::RGBA:
         iFormat = SDL_PIXELFORMAT_RGBA32;
         break;
