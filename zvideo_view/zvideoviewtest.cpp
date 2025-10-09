@@ -25,7 +25,8 @@ ZVideoViewTest::ZVideoViewTest(QWidget *parent)
     m_iHeight = 300;
     ui.label->resize(m_iWidth, m_iHeight);
     m_pVideoView = ZVideoView::CreateVideoView();
-    m_pVideoView->Init(m_iWidth, m_iHeight, ZVideoView::VideoFormat::YUV420P, (void*)ui.label->winId());
+    m_pVideoView->Init(m_iWidth, m_iHeight, ZVideoView::VideoFormat::YUV420P);
+    m_pVideoView->SetWindow((void*)ui.label->winId());
 
     //m_pData = new unsigned char[m_iWidth * m_iHeight * 2];
     m_pFrame = av_frame_alloc();

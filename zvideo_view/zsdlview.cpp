@@ -19,7 +19,7 @@ bool ZSDLView::InitSDLVideo() {
     return true;
 }
 
-bool ZSDLView::Init(int iWidth, int iHeight, VideoFormat eFormat, void* pWinId) {
+bool ZSDLView::Init(int iWidth, int iHeight, VideoFormat eFormat) {
     if (iWidth <= 0 || iHeight <= 0) {
         std::cerr << "Error param" << std::endl;
         return false;
@@ -42,11 +42,11 @@ bool ZSDLView::Init(int iWidth, int iHeight, VideoFormat eFormat, void* pWinId) 
 
     // ´´½¨´°¿Ú
     if (m_pSrceen == nullptr) {
-        if (pWinId == nullptr) {
+        if (m_pWindow == nullptr) {
             m_pSrceen = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                 iWidth, iHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
         } else {
-            m_pSrceen = SDL_CreateWindowFrom(pWinId);
+            m_pSrceen = SDL_CreateWindowFrom(m_pWindow);
         }
     }
     if (m_pSrceen == nullptr) {
@@ -70,7 +70,17 @@ bool ZSDLView::Init(int iWidth, int iHeight, VideoFormat eFormat, void* pWinId) 
     case ZVideoView::VideoFormat::YUV420P:
         iFormat = SDL_PIXELFORMAT_IYUV;
         break;
+    case ZVideoView::VideoFormat::NV12:
+        iFormat = SDL_PIXELFORMAT_NV12;
+        break;
     case ZVideoView::VideoFormat::RGBA:
+        iFormat = SDL_PIXELFORMAT_RGBA32;
+        break;
+    case ZVideoView::VideoFormat::BGRA:
+        iFormat = SDL_PIXELFORMAT_BGRA32;
+        break;
+    case ZVideoView::VideoFormat::RGB:
+        iFormat = SDL_PIXELFORMAT_RGB24;
     default:
         break;
     }
@@ -95,7 +105,11 @@ bool ZSDLView::Draw(const unsigned char* pData, int iLineSize) {
 
     if (iLineSize <= 0) {
         switch (m_eFormat) {
+        case ZVideoView::VideoFormat::RGB:
+            iLineSize = m_iWidth * 3;
+            break;
         case ZVideoView::VideoFormat::RGBA:
+        case ZVideoView::VideoFormat::BGRA:
         case ZVideoView::VideoFormat::ARGB:
             iLineSize = m_iWidth * 4;
             break;
