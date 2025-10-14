@@ -8,15 +8,18 @@ bool ZDecode::SendPacket(const AVPacket* pPacket) {
     return avcodec_send_packet(m_pCodecCtx, pPacket) == 0;
 }
 
-bool ZDecode::RecvFrame(AVFrame* pFrame) {
+int ZDecode::RecvFrame(AVFrame* pFrame) {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_pCodecCtx == nullptr) {
-        return false;
+        return -1;
     }
     // 如果有硬件加速 需要进行一次转换
     AVFrame* pShowFrame = pFrame;
     if (m_pCodecCtx->hw_device_ctx) {
         pShowFrame = av_frame_alloc();
+        if (!pShowFrame) {
+            return -1;
+        }
     }
     int iRet = avcodec_receive_frame(m_pCodecCtx, pShowFrame);
     if (iRet == 0) {
@@ -25,16 +28,26 @@ bool ZDecode::RecvFrame(AVFrame* pFrame) {
             av_frame_free(&pShowFrame);
             if (iRet != 0) {
                 std::cerr << "av_hwframe_transfer_data error: " << Utils::GetAVErrorMessage(iRet).c_str() << std::endl;
-                return false;
+                return -1;
             }
-            return true;
+            return 1; // 成功
         }
+        return 1; // 成功
     }
+
 
     if (m_pCodecCtx->hw_device_ctx) {
         av_frame_free(&pShowFrame);
     }
-    return false;
+    if (iRet == AVERROR(EAGAIN)) {
+        return 0; // 需要更多包
+    }
+    if (iRet == AVERROR_EOF) {
+        return -1; // 解码结束
+    }
+    // 其他错误
+    std::cerr << "avcodec_receive_frame error: " << Utils::GetAVErrorMessage(iRet).c_str() << std::endl;
+    return -1;
 }
 
 std::vector<AVFrame*> ZDecode::GetCacheFrames() {

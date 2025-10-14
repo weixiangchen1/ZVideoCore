@@ -13,8 +13,10 @@ public:
     /////////////////////////////////////////////////
     // 接收解码后的AVFrame (线程安全)
     // @para pFrame 解码后数据
-    // @return 失败返回false 成功返回true
-    bool RecvFrame(AVFrame* pFrame);
+    // @return 1: 成功并填充 pFrame
+    // 0: 需要更多数据（AVERROR(EAGAIN)）
+    // -1: 错误或 AVERROR_EOF
+    int RecvFrame(AVFrame* pFrame);
 
     /////////////////////////////////////////////////
     // 获取缓存中的AVFrame
