@@ -11,6 +11,7 @@
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavutil/opt.h"
+#include "libavformat/avformat.h"
 }
 
 class Utils {
