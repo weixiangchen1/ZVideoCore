@@ -37,8 +37,12 @@ void ZFormat::SetFormatContext(AVFormatContext* pFormatCtx) {
     for (int i = 0; i < pFormatCtx->nb_streams; ++i) {
         if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             m_iAudioIndex = i;
+            m_audioTimeBase.num = pFormatCtx->streams[i]->time_base.num;
+            m_audioTimeBase.den = pFormatCtx->streams[i]->time_base.den;
         } else if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             m_iVideoIndex = i;
+            m_videoTimeBase.num = pFormatCtx->streams[i]->time_base.num;
+            m_videoTimeBase.den = pFormatCtx->streams[i]->time_base.den;
         }
     }
 }

@@ -40,8 +40,8 @@ public:
 protected:
     AVFormatContext* m_pFormatCtx;          // 封装和解封装上下文
     std::mutex m_mutex;
-    int m_iVideoIndex = 0;                  // 视频流索引
-    int m_iAudioIndex = 1;                  // 音频流索引
+    int m_iVideoIndex = -1;                  // 视频流索引
+    int m_iAudioIndex = -1;                  // 音频流索引
     ZRational m_videoTimeBase = { 1,25 };
     ZRational m_audioTimeBase = { 1, 44100 };
 };
