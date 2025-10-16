@@ -153,7 +153,7 @@ void TestZDecode() {
     av_parser_close(pCodecPCtx);
 }
 
-void TestZFormat(std::string infile, std::string outfile, int beginTime, int endTime) {
+void TestZFormat(std::string infile, std::string outfile, int beginTime, int endTime, int width, int height) {
     // 解封装
     ZDemux demux;
     AVFormatContext* pFormatCtx = demux.CreateDemuxContext(infile.c_str());
@@ -164,23 +164,6 @@ void TestZFormat(std::string infile, std::string outfile, int beginTime, int end
     ZMux mux;
     AVFormatContext* pFormatECtx = mux.CreateMuxContext(outfile.c_str());
     mux.SetFormatContext(pFormatECtx);
-    AVStream* pVideoStream = pFormatECtx->streams[mux.GetVideoIndex()];
-    AVStream* pAudioStream = pFormatECtx->streams[mux.GetAudioIndex()];
-
-    if (demux.GetVideoIndex() >= 0) {
-        pVideoStream->time_base.den = demux.GetVideoTimeBase().den;
-        pVideoStream->time_base.num = demux.GetVideoTimeBase().num;
-
-        demux.CopyParam(demux.GetVideoIndex(), pVideoStream->codecpar);
-    }
-    if (demux.GetAudioIndex() >= 0) {
-        pAudioStream->time_base.den = demux.GetAudioTimeBase().den;
-        pAudioStream->time_base.num = demux.GetAudioTimeBase().num;
-
-        demux.CopyParam(demux.GetAudioIndex(), pAudioStream->codecpar);
-    }
-
-    mux.WriteHead();
 
     long long lVideoBeginPts = 0;
     long long lAudioBeginPts = 0;
@@ -197,24 +180,87 @@ void TestZFormat(std::string infile, std::string outfile, int beginTime, int end
         }
     }
 
+    // 视频解码器初始化
+    ZDecode decode;
+    AVCodecContext* pDCodecCtx = decode.CreateCodecContext(demux.GetVideoCodecId(), 1);
+    demux.CopyParam(demux.GetVideoIndex(), pDCodecCtx);
+    decode.SetCodecContext(pDCodecCtx);
+    decode.OpenCodec();
+
+    // 视频编码器初始化
+    int iVideoWidth = width;
+    int iVideoHeight = height;
+    if (demux.GetVideoIndex() >= 0) {
+        if (iVideoHeight <= 0 || iVideoHeight <= 0) {
+            iVideoWidth = pFormatECtx->streams[demux.GetVideoIndex()]->codecpar->width;
+            iVideoHeight = pFormatECtx->streams[demux.GetVideoIndex()]->codecpar->height;
+        }
+    }
+    ZEncode encode;
+    AVCodecContext* pECodecCtx = encode.CreateCodecContext((int)AV_CODEC_ID_H265, 0);
+    pECodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+    //pECodecCtx->width = iVideoWidth;
+    //pECodecCtx->height = iVideoHeight;
+    pECodecCtx->width = 1920;
+    pECodecCtx->height = 1080;
+    encode.SetCodecContext(pECodecCtx);
+    encode.OpenCodec();
+
+    AVStream* pVideoStream = pFormatECtx->streams[mux.GetVideoIndex()];
+    AVStream* pAudioStream = pFormatECtx->streams[mux.GetAudioIndex()];
+
+    if (demux.GetVideoIndex() >= 0) {
+        pVideoStream->time_base.den = demux.GetVideoTimeBase().den;
+        pVideoStream->time_base.num = demux.GetVideoTimeBase().num;
+
+        // demux.CopyParam(demux.GetVideoIndex(), pVideoStream->codecpar);
+        avcodec_parameters_from_context(pVideoStream->codecpar, pECodecCtx);
+    }
+    if (demux.GetAudioIndex() >= 0) {
+        pAudioStream->time_base.den = demux.GetAudioTimeBase().den;
+        pAudioStream->time_base.num = demux.GetAudioTimeBase().num;
+
+        demux.CopyParam(demux.GetAudioIndex(), pAudioStream->codecpar);
+    }
+
+    mux.WriteHead();
+
+    AVFrame* pFrame = decode.CreateFrame();
     AVPacket* pPacket = av_packet_alloc();
     while (demux.ReadFrame(pPacket)) {
         if (pPacket->stream_index == demux.GetVideoIndex()) {
+            mux.RescaleTimeParam(pPacket, lVideoBeginPts, demux.GetVideoTimeBase());
             if (lVideoEndPts > 0 && pPacket->pts > lVideoEndPts) {
                 av_packet_unref(pPacket);
                 break;
             }
-            mux.RescaleTimeParam(pPacket, lVideoBeginPts, demux.GetVideoTimeBase());
+            if (decode.SendPacket(pPacket)) {
+                while (true) {
+                    int iRet = decode.RecvFrame(pFrame);
+                    if (iRet == 1) {
+                        std::cout << "." << std::flush;
+                        AVPacket* pEPacket = encode.EncodeData(pFrame);
+                        if (pEPacket) {
+                            mux.WriteFrame(pEPacket);
+                            av_packet_free(&pEPacket);
+                        }
+                    } else break;
+                }
+            }
         } else if (pPacket->stream_index == demux.GetAudioIndex()) {
             mux.RescaleTimeParam(pPacket, lAudioBeginPts, demux.GetAudioTimeBase());
+            mux.WriteFrame(pPacket);
+        } else {
+            av_packet_unref(pPacket);
         }
-        mux.WriteFrame(pPacket);
     }
 
     mux.WriteTail();
 
     demux.SetFormatContext(nullptr);
     mux.SetFormatContext(nullptr);
+    encode.SetCodecContext(nullptr);
+    decode.SetCodecContext(nullptr);
     av_packet_free(&pPacket);
 }
 
@@ -234,8 +280,8 @@ int main(int argc, char *argv[]) {
     //TestZEncode(codecId);
     //TestZDecode();
 
-    std::string strUseage = "input file | output file | begin time | end time \n";
-    strUseage += "eg: v1080.mp4 out.mp4 10 20\n";
+    std::string strUseage = "input file | output file | begin time | end time | width | height\n";
+    strUseage += "eg: v1080.mp4 out.mp4 10 20 400 300 \n";
     std::cout << strUseage;
 
     if (argc < 3) {
@@ -245,13 +291,19 @@ int main(int argc, char *argv[]) {
     std::string strOutFile = argv[2];
     int iBeginTime = 0;
     int iEndTime = 0;
+    int iWidth = 0;
+    int iHeight = 0;
     if (argc > 3) {
         iBeginTime = atoi(argv[3]);
     }
     if (argc > 4) {
         iEndTime = atoi(argv[4]);
     }
+    if (argc > 6) {
+        iWidth = atoi(argv[5]);
+        iHeight = atoi(argv[6]);
+    }
 
-    TestZFormat(strInFile, strOutFile, iBeginTime, iEndTime);
+    TestZFormat(strInFile, strOutFile, iBeginTime, iEndTime, iWidth, iHeight);
     return 0;
 }

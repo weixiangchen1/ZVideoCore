@@ -3,6 +3,7 @@
 #include <mutex>
 struct AVPacket;
 struct AVFormatContext;
+struct AVCodecContext;
 struct AVCodecParameters;
 struct ZRational {
     int num;    ///< Numerator
@@ -18,6 +19,7 @@ public:
     // @para dstParameter 输出参数
     // @return 成功返回true 失败返回false
     bool CopyParam(int iStreamIndex, AVCodecParameters* dstParameter);
+    bool CopyParam(int iStreamIndex, AVCodecContext* dstCodecCtx);
 
     /////////////////////////////////////////////////
     // 设置封装或解封装上下文 (线程安全)
@@ -44,6 +46,12 @@ public:
     // @para timeBase 表示 pPacket 原始时间戳
     // @return 成功返回true 失败返回false
     bool RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, ZRational timeBase);
+
+    /////////////////////////////////////////////////
+    // 获取视频编码器ID
+    // @return 视频编码器ID
+    int GetVideoCodecId();
+
 protected:
     AVFormatContext* m_pFormatCtx;          // 封装和解封装上下文
     std::mutex m_mutex;
@@ -51,5 +59,6 @@ protected:
     int m_iAudioIndex = -1;                  // 音频流索引
     ZRational m_videoTimeBase = { 1,25 };
     ZRational m_audioTimeBase = { 1, 44100 };
+    int m_iVideoCodecId = 0;                 // 编码器ID
 };
 

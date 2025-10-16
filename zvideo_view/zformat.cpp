@@ -12,6 +12,17 @@ bool ZFormat::CopyParam(int iStreamIndex, AVCodecParameters* dstParameter) {
     return avcodec_parameters_copy(dstParameter, m_pFormatCtx->streams[iStreamIndex]->codecpar) >= 0;
 }
 
+bool ZFormat::CopyParam(int iStreamIndex, AVCodecContext* dstCodecCtx) {
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (m_pFormatCtx == nullptr) {
+        return false;
+    }
+    if (iStreamIndex < 0 || iStreamIndex > m_pFormatCtx->nb_streams) {
+        return false;
+    }
+    return avcodec_parameters_to_context(dstCodecCtx, m_pFormatCtx->streams[iStreamIndex]->codecpar) >= 0;
+}
+
 void ZFormat::SetFormatContext(AVFormatContext* pFormatCtx) {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_pFormatCtx) {
@@ -41,6 +52,7 @@ void ZFormat::SetFormatContext(AVFormatContext* pFormatCtx) {
             m_audioTimeBase.den = pFormatCtx->streams[i]->time_base.den;
         } else if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             m_iVideoIndex = i;
+            m_iVideoCodecId = pFormatCtx->streams[i]->codecpar->codec_id;
             m_videoTimeBase.num = pFormatCtx->streams[i]->time_base.num;
             m_videoTimeBase.den = pFormatCtx->streams[i]->time_base.den;
         }
@@ -80,4 +92,9 @@ bool ZFormat::RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, ZRationa
     pPacket->pos = -1;
 
     return true;
+}
+
+int ZFormat::GetVideoCodecId() {
+
+    return m_iVideoCodecId;
 }
