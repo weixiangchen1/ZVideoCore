@@ -4,11 +4,14 @@
 #include "zcodec.h"
 #include "zdecode.h"
 #include "zencode.h"
+#include "zmux.h"
+#include "zdemux.h"
 #include "zvideoview.h"
 #include "utils.h"
 
 #pragma comment(lib, "avcodec.lib")
 #pragma comment(lib, "avutil.lib")
+#pragma comment(lib, "avformat.lib")
 
 void TestZEncode(AVCodecID id) {
     std::string strFile = "400_300_25_1";
@@ -150,20 +153,62 @@ void TestZDecode() {
     av_parser_close(pCodecPCtx);
 }
 
+void TestZFormat() {
+    const char* strURL = "v1080.mp4";
+    // ½â·â×°
+    ZDemux demux;
+    AVFormatContext* pFormatCtx = demux.CreateDemuxContext(strURL);
+    demux.SetFormatContext(pFormatCtx);
+
+    const char* strOutURL = "out1.mp4";
+    // ·â×°
+    ZMux mux;
+    AVFormatContext* pFormatECtx = mux.CreateMuxContext(strOutURL);
+    mux.SetFormatContext(pFormatECtx);
+    AVStream* pVideoStream = pFormatECtx->streams[mux.GetVideoIndex()];
+    AVStream* pAudioStream = pFormatECtx->streams[mux.GetAudioIndex()];
+
+    if (demux.GetVideoIndex() >= 0) {
+        pVideoStream->time_base.den = demux.GetVideoTimeBase().den;
+        pVideoStream->time_base.num = demux.GetVideoTimeBase().num;
+
+        demux.CopyParam(demux.GetVideoIndex(), pVideoStream->codecpar);
+    }
+    if (demux.GetAudioIndex() >= 0) {
+        pAudioStream->time_base.den = demux.GetAudioTimeBase().den;
+        pAudioStream->time_base.num = demux.GetAudioTimeBase().num;
+
+        demux.CopyParam(demux.GetAudioIndex(), pAudioStream->codecpar);
+    }
+
+    mux.WriteHead();
+
+    AVPacket* pPacket = av_packet_alloc();
+    while (demux.ReadFrame(pPacket)) {
+        mux.WriteFrame(pPacket);
+    }
+
+    mux.WriteTail();
+
+    demux.SetFormatContext(nullptr);
+    mux.SetFormatContext(nullptr);
+}
+
 int main(int argc, char *argv[]) {
     //QApplication app(argc, argv);
     //ZVideoViewTest window;
     //window.show();
     //return app.exec();
 
-    AVCodecID codecId = AV_CODEC_ID_H264;
-    if (argc > 1) {
-        std::string strCodec = argv[1];
-        if (strCodec == "h265" || strCodec == "hevc") {
-            codecId = AV_CODEC_ID_HEVC;
-        }
-    }
-    TestZEncode(codecId);
-    TestZDecode();
+    //AVCodecID codecId = AV_CODEC_ID_H264;
+    //if (argc > 1) {
+    //    std::string strCodec = argv[1];
+    //    if (strCodec == "h265" || strCodec == "hevc") {
+    //        codecId = AV_CODEC_ID_HEVC;
+    //    }
+    //}
+    //TestZEncode(codecId);
+    //TestZDecode();
+    TestZFormat();
     return 0;
 }

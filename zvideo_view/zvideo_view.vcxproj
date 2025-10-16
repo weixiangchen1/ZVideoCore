@@ -107,7 +107,10 @@
     <QtMoc Include="zvideoviewtest.h" />
     <ClCompile Include="zcodec.cpp" />
     <ClCompile Include="zdecode.cpp" />
+    <ClCompile Include="zdemux.cpp" />
     <ClCompile Include="zencode.cpp" />
+    <ClCompile Include="zformat.cpp" />
+    <ClCompile Include="zmux.cpp" />
     <ClCompile Include="zsdlview.cpp" />
     <ClCompile Include="zvideoview.cpp" />
     <ClCompile Include="zvideoviewtest.cpp" />
@@ -117,7 +120,10 @@
     <ClInclude Include="utils.h" />
     <ClInclude Include="zcodec.h" />
     <ClInclude Include="zdecode.h" />
+    <ClInclude Include="zdemux.h" />
     <ClInclude Include="zencode.h" />
+    <ClInclude Include="zformat.h" />
+    <ClInclude Include="zmux.h" />
     <ClInclude Include="zsdlview.h" />
     <ClInclude Include="zvideoview.h" />
   </ItemGroup>

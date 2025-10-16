@@ -49,6 +49,21 @@
     <ClCompile Include="zencode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zcodec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zdecode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zformat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zdemux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zmux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zvideoview.h">
@@ -61,6 +76,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zencode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zcodec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zdecode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zformat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zdemux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zmux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

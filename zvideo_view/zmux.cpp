@@ -4,7 +4,7 @@
 AVFormatContext* ZMux::CreateMuxContext(const char* strURL) {
     AVFormatContext* pFormatCtx = nullptr;
     // 创建封装上下文
-    int iRet = avformat_alloc_output_context2(&pFormatCtx, nullptr, strURL, nullptr);
+    int iRet = avformat_alloc_output_context2(&pFormatCtx, nullptr, nullptr, strURL);
     if (iRet != 0) {
         std::cerr << "avformat_alloc_output_context2 error: " <<
             Utils::GetAVErrorMessage(iRet).c_str() << std::endl;
@@ -40,7 +40,7 @@ bool ZMux::WriteHead() {
         return false;
     }
     // 打印输出封装信息
-    av_dump_format(m_pFormatCtx, 0, m_pFormatCtx->url, 0);
+    av_dump_format(m_pFormatCtx, 0, m_pFormatCtx->url, 1);
 
     return true;
 }
@@ -50,7 +50,7 @@ bool ZMux::WriteFrame(AVPacket* pPacket) {
     if (m_pFormatCtx == nullptr) {
         return false;
     }
-    int iRet = av_interleaved_write_frame(m_pFormatCtx, nullptr);
+    int iRet = av_interleaved_write_frame(m_pFormatCtx, pPacket);
     if (iRet != 0) {
         std::cerr << "av_interleaved_write_frame error: " <<
             Utils::GetAVErrorMessage(iRet).c_str() << std::endl;
