@@ -37,6 +37,13 @@ public:
     ZRational GetVideoTimeBase();
     ZRational GetAudioTimeBase();
 
+    /////////////////////////////////////////////////
+    // 根据time_base换算时间参数
+    // @para pPacket 需要进行转换的视频帧
+    // @para lOffsetPts 时间戳偏移量
+    // @para timeBase 表示 pPacket 原始时间戳
+    // @return 成功返回true 失败返回false
+    bool RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, ZRational timeBase);
 protected:
     AVFormatContext* m_pFormatCtx;          // 封装和解封装上下文
     std::mutex m_mutex;

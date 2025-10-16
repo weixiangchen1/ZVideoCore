@@ -38,3 +38,19 @@ bool ZDemux::ReadFrame(AVPacket* pPacket) {
     }
     return true;
 }
+
+bool ZDemux::SeekFrame(long long lPts, int iStreamIndex) {
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (m_pFormatCtx == nullptr) {
+        return false;
+    }
+    int iRet = av_seek_frame(m_pFormatCtx, iStreamIndex, lPts,
+        AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+    if (iRet != 0) {
+        std::cerr << "av_seek_frame error: " <<
+            Utils::GetAVErrorMessage(iRet).c_str() << std::endl;
+        return false;
+    }
+
+    return true;
+}

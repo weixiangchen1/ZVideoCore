@@ -153,17 +153,16 @@ void TestZDecode() {
     av_parser_close(pCodecPCtx);
 }
 
-void TestZFormat() {
-    const char* strURL = "v1080.mp4";
+void TestZFormat(std::string infile, std::string outfile, int beginTime, int endTime) {
     // ½â·â×°
     ZDemux demux;
-    AVFormatContext* pFormatCtx = demux.CreateDemuxContext(strURL);
+    AVFormatContext* pFormatCtx = demux.CreateDemuxContext(infile.c_str());
     demux.SetFormatContext(pFormatCtx);
 
     const char* strOutURL = "out1.mp4";
     // ·â×°
     ZMux mux;
-    AVFormatContext* pFormatECtx = mux.CreateMuxContext(strOutURL);
+    AVFormatContext* pFormatECtx = mux.CreateMuxContext(outfile.c_str());
     mux.SetFormatContext(pFormatECtx);
     AVStream* pVideoStream = pFormatECtx->streams[mux.GetVideoIndex()];
     AVStream* pAudioStream = pFormatECtx->streams[mux.GetAudioIndex()];
@@ -183,8 +182,32 @@ void TestZFormat() {
 
     mux.WriteHead();
 
+    long long lVideoBeginPts = 0;
+    long long lAudioBeginPts = 0;
+    long long lVideoEndPts = 0;
+    if (beginTime > 0) {
+        if (demux.GetVideoIndex() >= 0 && demux.GetVideoTimeBase().num > 0) {
+            lVideoBeginPts = beginTime * (double)demux.GetVideoTimeBase().den / (double)demux.GetVideoTimeBase().num;
+            lVideoEndPts = endTime * (double)demux.GetVideoTimeBase().den / (double)demux.GetVideoTimeBase().num;
+            demux.SeekFrame(lVideoBeginPts, demux.GetVideoIndex());
+        }
+        if (demux.GetAudioIndex() >= 0 && demux.GetAudioTimeBase().num > 0) {
+            lAudioBeginPts = beginTime * (double)demux.GetAudioTimeBase().den / (double)demux.GetAudioTimeBase().num;
+            demux.SeekFrame(lAudioBeginPts, demux.GetAudioIndex());
+        }
+    }
+
     AVPacket* pPacket = av_packet_alloc();
     while (demux.ReadFrame(pPacket)) {
+        if (pPacket->stream_index == demux.GetVideoIndex()) {
+            if (lVideoEndPts > 0 && pPacket->pts > lVideoEndPts) {
+                av_packet_unref(pPacket);
+                break;
+            }
+            mux.RescaleTimeParam(pPacket, lVideoBeginPts, demux.GetVideoTimeBase());
+        } else if (pPacket->stream_index == demux.GetAudioIndex()) {
+            mux.RescaleTimeParam(pPacket, lAudioBeginPts, demux.GetAudioTimeBase());
+        }
         mux.WriteFrame(pPacket);
     }
 
@@ -192,6 +215,7 @@ void TestZFormat() {
 
     demux.SetFormatContext(nullptr);
     mux.SetFormatContext(nullptr);
+    av_packet_free(&pPacket);
 }
 
 int main(int argc, char *argv[]) {
@@ -209,6 +233,25 @@ int main(int argc, char *argv[]) {
     //}
     //TestZEncode(codecId);
     //TestZDecode();
-    TestZFormat();
+
+    std::string strUseage = "input file | output file | begin time | end time \n";
+    strUseage += "eg: v1080.mp4 out.mp4 10 20\n";
+    std::cout << strUseage;
+
+    if (argc < 3) {
+        return -1;
+    }
+    std::string strInFile = argv[1];
+    std::string strOutFile = argv[2];
+    int iBeginTime = 0;
+    int iEndTime = 0;
+    if (argc > 3) {
+        iBeginTime = atoi(argv[3]);
+    }
+    if (argc > 4) {
+        iEndTime = atoi(argv[4]);
+    }
+
+    TestZFormat(strInFile, strOutFile, iBeginTime, iEndTime);
     return 0;
 }

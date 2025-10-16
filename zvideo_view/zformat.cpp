@@ -62,3 +62,22 @@ ZRational ZFormat::GetVideoTimeBase() {
 ZRational ZFormat::GetAudioTimeBase() {
     return m_audioTimeBase;
 }
+
+bool ZFormat::RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, ZRational timeBase) {
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (m_pFormatCtx == nullptr) {
+        return false;
+    }
+    AVStream* pOutStream = m_pFormatCtx->streams[pPacket->stream_index];
+    AVRational inTimeBase;
+    inTimeBase.den = timeBase.den;
+    inTimeBase.num = timeBase.num;
+    pPacket->pts = av_rescale_q_rnd(pPacket->pts - lOffsetPts, inTimeBase,
+        pOutStream->time_base, (AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+    pPacket->dts = av_rescale_q_rnd(pPacket->dts - lOffsetPts, inTimeBase,
+        pOutStream->time_base, (AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+    pPacket->duration = av_rescale_q(pPacket->duration, inTimeBase, pOutStream->time_base);
+    pPacket->pos = -1;
+
+    return true;
+}
