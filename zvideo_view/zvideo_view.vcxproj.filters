@@ -64,6 +64,12 @@
     <ClCompile Include="zmux.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zthread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zlog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zvideoview.h">
@@ -91,6 +97,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zmux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zlog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

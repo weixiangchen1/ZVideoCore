@@ -110,8 +110,10 @@
     <ClCompile Include="zdemux.cpp" />
     <ClCompile Include="zencode.cpp" />
     <ClCompile Include="zformat.cpp" />
+    <ClCompile Include="zlog.cpp" />
     <ClCompile Include="zmux.cpp" />
     <ClCompile Include="zsdlview.cpp" />
+    <ClCompile Include="zthread.cpp" />
     <ClCompile Include="zvideoview.cpp" />
     <ClCompile Include="zvideoviewtest.cpp" />
     <ClCompile Include="main.cpp" />
@@ -123,8 +125,10 @@
     <ClInclude Include="zdemux.h" />
     <ClInclude Include="zencode.h" />
     <ClInclude Include="zformat.h" />
+    <ClInclude Include="zlog.h" />
     <ClInclude Include="zmux.h" />
     <ClInclude Include="zsdlview.h" />
+    <ClInclude Include="zthread.h" />
     <ClInclude Include="zvideoview.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
