@@ -4,6 +4,7 @@
 
 class ZAVParam;
 struct AVPacket;
+struct AVRational;
 struct AVFormatContext;
 struct AVCodecContext;
 struct AVCodecParameters;
@@ -27,6 +28,7 @@ public:
     // 复制视频参数 (线程安全)
     // @return 返回视频参数的智能指针
     std::shared_ptr<ZAVParam> CopyVideoParam();
+    std::shared_ptr<ZAVParam> CopyAudioParam();
 
     /////////////////////////////////////////////////
     // 设置封装或解封装上下文 (线程安全)
@@ -53,6 +55,7 @@ public:
     // @para timeBase 表示 pPacket 原始时间戳
     // @return 成功返回true 失败返回false
     bool RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, ZRational timeBase);
+    bool RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, AVRational* pTimeBase);
 
     /////////////////////////////////////////////////
     // 获取视频编码器ID

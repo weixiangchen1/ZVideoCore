@@ -79,6 +79,9 @@
     <ClCompile Include="zavpacketlist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zmuxtask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zvideoview.h">
@@ -124,6 +127,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zavpacketlist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zmuxtask.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

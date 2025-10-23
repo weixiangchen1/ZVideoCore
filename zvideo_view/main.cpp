@@ -8,9 +8,11 @@
 #include "zdemux.h"
 #include "zdemuxtask.h"
 #include "zdecodetask.h"
+#include "zmuxtask.h"
 #include "zvideoview.h"
 #include "zavparam.h"
 #include "utils.h"
+#include "zlog.h"
 
 #pragma comment(lib, "avcodec.lib")
 #pragma comment(lib, "avutil.lib")
@@ -299,6 +301,60 @@ void TestZDemuxTask() {
     getchar();
 }
 
+void TestZMuxTask() {
+    ZDemuxTask demuxTask;
+    ZMuxTask muxTask;
+    while (true) {
+        if (demuxTask.OpenDemux("rtsp://127.0.0.1:8554/test")) {
+            break;
+        }
+        Utils::MSleep(100);
+        continue;
+    }
+    std::shared_ptr<ZAVParam> pVParam = demuxTask.CopyVideoParam();
+    AVCodecParameters* pVideoParam = nullptr;
+    AVRational* pVideoTB = nullptr;
+    if (pVParam) {
+        pVideoParam = pVParam->pParam;
+        pVideoTB = pVParam->pTimebase;
+    }
+    std::shared_ptr<ZAVParam> pAParam = demuxTask.CopyAudioParam();
+    AVCodecParameters* pAudioParam = nullptr;
+    AVRational* pAudioTB = nullptr;
+    if (pAParam) {
+        pAudioParam = pAParam->pParam;
+        pAudioTB = pAParam->pTimebase;
+    }
+    if (!muxTask.OpenMux("rtspOut1.mp4", pVideoParam, pVideoTB, pAudioParam, pAudioTB)) {
+        ZLOGERROR("open mux failed");
+        return;
+    }
+    demuxTask.SetNextNode(&muxTask);
+    demuxTask.Start();
+    muxTask.Start();
+    Utils::MSleep(10000);
+    muxTask.Stop();
+
+    if (!muxTask.OpenMux("rtspOut2.mp4", pVideoParam, pVideoTB, pAudioParam, pAudioTB)) {
+        ZLOGERROR("open mux failed");
+        return;
+    }
+    muxTask.Start();
+    Utils::MSleep(10000);
+    muxTask.Stop();
+
+    getchar();
+
+    //ZVideoView* pVideoView = ZVideoView::CreateVideoView();
+    //pVideoView->Init(pVParam->pParam);
+    //ZDecodeTask decodeTask;
+    //if (decodeTask.OpenDecodec(pVParam->pParam)) {
+    //    demuxTask.SetNextNode(&decodeTask);
+    //    demuxTask.Start();
+    //    decodeTask.Start();
+    //}
+}
+
 int main(int argc, char *argv[]) {
     //QApplication app(argc, argv);
     //ZVideoViewTest window;
@@ -341,7 +397,9 @@ int main(int argc, char *argv[]) {
 
     //TestZFormat(strInFile, strOutFile, iBeginTime, iEndTime, iWidth, iHeight);
 
-    TestZDemuxTask();
+    //TestZDemuxTask();
+
+    TestZMuxTask();
 
     return 0;
 }

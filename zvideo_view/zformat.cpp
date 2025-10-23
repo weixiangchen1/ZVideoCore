@@ -46,6 +46,20 @@ std::shared_ptr<ZAVParam> ZFormat::CopyVideoParam() {
     return pAVParam;
 }
 
+std::shared_ptr<ZAVParam> ZFormat::CopyAudioParam() {
+    int iAudioStreamIdx = GetAudioIndex();
+    std::shared_ptr<ZAVParam> pAVParam;
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (iAudioStreamIdx < 0 || m_pFormatCtx == nullptr) {
+        return pAVParam;
+    }
+    pAVParam.reset(ZAVParam::CreateAVParam());
+    *pAVParam->pTimebase = m_pFormatCtx->streams[iAudioStreamIdx]->time_base;
+    avcodec_parameters_copy(pAVParam->pParam, m_pFormatCtx->streams[iAudioStreamIdx]->codecpar);
+
+    return pAVParam;
+}
+
 void ZFormat::SetFormatContext(AVFormatContext* pFormatCtx) {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_pFormatCtx) {
@@ -108,19 +122,23 @@ ZRational ZFormat::GetAudioTimeBase() {
 }
 
 bool ZFormat::RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, ZRational timeBase) {
-    std::unique_lock<std::mutex> lock(m_mutex);
-    if (m_pFormatCtx == nullptr) {
+    AVRational inTimeBase;
+    inTimeBase.num = timeBase.num;
+    inTimeBase.den = timeBase.den;
+
+    return RescaleTimeParam(pPacket, lOffsetPts, &inTimeBase);
+}
+
+bool ZFormat::RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, AVRational* pTimeBase) {
+    if (pPacket == nullptr || pTimeBase == nullptr) {
         return false;
     }
     AVStream* pOutStream = m_pFormatCtx->streams[pPacket->stream_index];
-    AVRational inTimeBase;
-    inTimeBase.den = timeBase.den;
-    inTimeBase.num = timeBase.num;
-    pPacket->pts = av_rescale_q_rnd(pPacket->pts - lOffsetPts, inTimeBase,
+    pPacket->pts = av_rescale_q_rnd(pPacket->pts - lOffsetPts, *pTimeBase,
         pOutStream->time_base, (AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-    pPacket->dts = av_rescale_q_rnd(pPacket->dts - lOffsetPts, inTimeBase,
+    pPacket->dts = av_rescale_q_rnd(pPacket->dts - lOffsetPts, *pTimeBase,
         pOutStream->time_base, (AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-    pPacket->duration = av_rescale_q(pPacket->duration, inTimeBase, pOutStream->time_base);
+    pPacket->duration = av_rescale_q(pPacket->duration, *pTimeBase, pOutStream->time_base);
     pPacket->pos = -1;
 
     return true;

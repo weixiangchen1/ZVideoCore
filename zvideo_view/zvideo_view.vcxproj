@@ -115,6 +115,7 @@
     <ClCompile Include="zencode.cpp" />
     <ClCompile Include="zformat.cpp" />
     <ClCompile Include="zmux.cpp" />
+    <ClCompile Include="zmuxtask.cpp" />
     <ClCompile Include="zsdlview.cpp" />
     <ClCompile Include="zthread.cpp" />
     <ClCompile Include="zvideoview.cpp" />
@@ -134,6 +135,7 @@
     <ClInclude Include="zformat.h" />
     <ClInclude Include="zlog.h" />
     <ClInclude Include="zmux.h" />
+    <ClInclude Include="zmuxtask.h" />
     <ClInclude Include="zsdlview.h" />
     <ClInclude Include="zthread.h" />
     <ClInclude Include="zvideoview.h" />

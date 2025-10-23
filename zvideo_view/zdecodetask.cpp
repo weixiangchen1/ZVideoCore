@@ -27,7 +27,7 @@ bool ZDecodeTask::OpenDecodec(AVCodecParameters* pCodecParam) {
 
 void ZDecodeTask::DoWork(AVPacket* pPacket) {
     std::cout << "#" << std::flush;
-    if (pPacket == nullptr || pPacket->stream_index != 0) {
+    if (pPacket == nullptr || pPacket->stream_index != 1) {
         return;
     }
     m_listPackets.Push(pPacket);
@@ -61,6 +61,8 @@ void ZDecodeTask::threadFunc() {
             if (iRet == 1) {
                 std::cout << "@" << std::flush;
                 m_bCanRender = true;
+            } else {
+                continue;
             }
         }
 

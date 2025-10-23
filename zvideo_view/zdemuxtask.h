@@ -16,6 +16,7 @@ public:
 
     // 复制视频参数
     std::shared_ptr<ZAVParam> CopyVideoParam();
+    std::shared_ptr<ZAVParam> CopyAudioParam();
 
 private:
     int m_iTimeoutMs = 0;

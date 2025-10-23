@@ -28,6 +28,10 @@ std::shared_ptr<ZAVParam> ZDemuxTask::CopyVideoParam() {
     return m_demux.CopyVideoParam();
 }
 
+std::shared_ptr<ZAVParam> ZDemuxTask::CopyAudioParam() {
+    return m_demux.CopyAudioParam();
+}
+
 bool ZDemuxTask::OpenDemux(std::string strURL, int iTimeoutMs) {
     ZLOGDEBUG("OpenDemux begin");
     m_demux.SetFormatContext(nullptr);      // 断开之前的连接
