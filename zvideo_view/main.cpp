@@ -6,7 +6,10 @@
 #include "zencode.h"
 #include "zmux.h"
 #include "zdemux.h"
+#include "zdemuxtask.h"
+#include "zdecodetask.h"
 #include "zvideoview.h"
+#include "zavparam.h"
 #include "utils.h"
 
 #pragma comment(lib, "avcodec.lib")
@@ -264,6 +267,38 @@ void TestZFormat(std::string infile, std::string outfile, int beginTime, int end
     av_packet_free(&pPacket);
 }
 
+void TestZDemuxTask() {
+    ZDemuxTask demuxTask;
+    while (true) {
+        if (demuxTask.OpenDemux("rtsp://127.0.0.1:8554/test")) {
+            break;
+        }
+        Utils::MSleep(100);
+        continue;
+    }
+    std::shared_ptr<ZAVParam> pAVParam = demuxTask.CopyVideoParam();
+    ZVideoView* pVideoView = ZVideoView::CreateVideoView();
+    pVideoView->Init(pAVParam->pParam);
+    ZDecodeTask decodeTask;
+    if (decodeTask.OpenDecodec(pAVParam->pParam)) {
+        demuxTask.SetNextNode(&decodeTask);
+        demuxTask.Start();
+        decodeTask.Start();
+    }
+
+    while (true) {
+        AVFrame* pFrame = decodeTask.GetFrame();
+        if (pFrame == nullptr) {
+            Utils::MSleep(1);
+            continue;
+        }
+        pVideoView->DrawFrame(pFrame);
+        Utils::ReleaseFrame(&pFrame);
+    }
+
+    getchar();
+}
+
 int main(int argc, char *argv[]) {
     //QApplication app(argc, argv);
     //ZVideoViewTest window;
@@ -280,30 +315,33 @@ int main(int argc, char *argv[]) {
     //TestZEncode(codecId);
     //TestZDecode();
 
-    std::string strUseage = "input file | output file | begin time | end time | width | height\n";
-    strUseage += "eg: v1080.mp4 out.mp4 10 20 400 300 \n";
-    std::cout << strUseage;
+    //std::string strUseage = "input file | output file | begin time | end time | width | height\n";
+    //strUseage += "eg: v1080.mp4 out.mp4 10 20 400 300 \n";
+    //std::cout << strUseage;
 
-    if (argc < 3) {
-        return -1;
-    }
-    std::string strInFile = argv[1];
-    std::string strOutFile = argv[2];
-    int iBeginTime = 0;
-    int iEndTime = 0;
-    int iWidth = 0;
-    int iHeight = 0;
-    if (argc > 3) {
-        iBeginTime = atoi(argv[3]);
-    }
-    if (argc > 4) {
-        iEndTime = atoi(argv[4]);
-    }
-    if (argc > 6) {
-        iWidth = atoi(argv[5]);
-        iHeight = atoi(argv[6]);
-    }
+    //if (argc < 3) {
+    //    return -1;
+    //}
+    //std::string strInFile = argv[1];
+    //std::string strOutFile = argv[2];
+    //int iBeginTime = 0;
+    //int iEndTime = 0;
+    //int iWidth = 0;
+    //int iHeight = 0;
+    //if (argc > 3) {
+    //    iBeginTime = atoi(argv[3]);
+    //}
+    //if (argc > 4) {
+    //    iEndTime = atoi(argv[4]);
+    //}
+    //if (argc > 6) {
+    //    iWidth = atoi(argv[5]);
+    //    iHeight = atoi(argv[6]);
+    //}
 
-    TestZFormat(strInFile, strOutFile, iBeginTime, iEndTime, iWidth, iHeight);
+    //TestZFormat(strInFile, strOutFile, iBeginTime, iEndTime, iWidth, iHeight);
+
+    TestZDemuxTask();
+
     return 0;
 }

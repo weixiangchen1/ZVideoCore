@@ -105,12 +105,15 @@
     <QtRcc Include="zvideoviewtest.qrc" />
     <QtUic Include="zvideoviewtest.ui" />
     <QtMoc Include="zvideoviewtest.h" />
+    <ClCompile Include="zavpacketlist.cpp" />
+    <ClCompile Include="zavparam.cpp" />
     <ClCompile Include="zcodec.cpp" />
     <ClCompile Include="zdecode.cpp" />
+    <ClCompile Include="zdecodetask.cpp" />
     <ClCompile Include="zdemux.cpp" />
+    <ClCompile Include="zdemuxtask.cpp" />
     <ClCompile Include="zencode.cpp" />
     <ClCompile Include="zformat.cpp" />
-    <ClCompile Include="zlog.cpp" />
     <ClCompile Include="zmux.cpp" />
     <ClCompile Include="zsdlview.cpp" />
     <ClCompile Include="zthread.cpp" />
@@ -120,9 +123,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utils.h" />
+    <ClInclude Include="zavpacketlist.h" />
+    <ClInclude Include="zavparam.h" />
     <ClInclude Include="zcodec.h" />
     <ClInclude Include="zdecode.h" />
+    <ClInclude Include="zdecodetask.h" />
     <ClInclude Include="zdemux.h" />
+    <ClInclude Include="zdemuxtask.h" />
     <ClInclude Include="zencode.h" />
     <ClInclude Include="zformat.h" />
     <ClInclude Include="zlog.h" />

@@ -45,5 +45,12 @@ public:
         av_strerror(iErrorId, strMsg, sizeof(strMsg) - 1);
         return std::string(strMsg);
     }
+
+    static void ReleaseFrame(AVFrame** pFrame) {
+        if (!pFrame || !(*pFrame)) {
+            return;
+        }
+        av_frame_free(pFrame);
+    }
 };
 

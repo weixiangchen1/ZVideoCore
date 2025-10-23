@@ -24,6 +24,22 @@ ZVideoView* ZVideoView::CreateVideoView(RenderType eType) {
     return nullptr;
 }
 
+bool ZVideoView::Init(AVCodecParameters* pAVParam) {
+	if (pAVParam == nullptr) {
+		return false;
+	}
+	VideoFormat eFormat = (VideoFormat)pAVParam->format;
+	switch (pAVParam->format) {
+	case AV_PIX_FMT_YUV420P:
+	case AV_PIX_FMT_YUVJ420P:
+		eFormat = VideoFormat::YUV420P;
+		break;
+	default:
+		break;
+	}
+	return Init(pAVParam->width, pAVParam->height, eFormat);
+}
+
 bool ZVideoView::DrawFrame(AVFrame* pFrame) {
 	if (pFrame == nullptr || pFrame->data[0] == nullptr) {
 		return false;
@@ -38,6 +54,7 @@ bool ZVideoView::DrawFrame(AVFrame* pFrame) {
 	}
 	switch (pFrame->format) {
 	case AV_PIX_FMT_YUV420P:
+	case AV_PIX_FMT_YUVJ420P:
 		return Draw(pFrame->data[0], pFrame->linesize[0],
 					pFrame->data[1], pFrame->linesize[1], 
 					pFrame->data[2], pFrame->linesize[2]);

@@ -20,3 +20,17 @@ void ZThread::Stop() {
     }
     ZLOGINFO("thread stop already thread");
 }
+
+void ZThread::DoWork(AVPacket* pPacket) {}
+
+void ZThread::Next(AVPacket* pPacket) {
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (m_pNext != nullptr) {
+        m_pNext->DoWork(pPacket);
+    }
+}
+
+void ZThread::SetNextNode(ZThread* pNext) {
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_pNext = pNext;
+}

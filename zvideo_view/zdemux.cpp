@@ -3,8 +3,14 @@
 
 AVFormatContext* ZDemux::CreateDemuxContext(const char* strURL) {
     AVFormatContext* pFormatCtx = nullptr;
+    AVDictionary* pDictionary = nullptr;
+    // av_dict_set(&pDictionary, "rtsp_transport", "tcp", 0);      // 设置流媒体传输协议
+    av_dict_set(&pDictionary, "stimeout", "1000000", 0);        // 设置连接超时时间
     // 打开解封装上下文
-    int iRet = avformat_open_input(&pFormatCtx, strURL, nullptr, nullptr);
+    int iRet = avformat_open_input(&pFormatCtx, strURL, nullptr, &pDictionary);
+    if (pDictionary) {
+        av_dict_free(&pDictionary);
+    }
     if (iRet != 0) {
         std::cerr << "avformat_open_input error: " <<
             Utils::GetAVErrorMessage(iRet).c_str() << std::endl;
@@ -36,6 +42,7 @@ bool ZDemux::ReadFrame(AVPacket* pPacket) {
             Utils::GetAVErrorMessage(iRet).c_str() << std::endl;
         return false;
     }
+    m_lLastTime = Utils::GetCurrentTimestamp();
     return true;
 }
 

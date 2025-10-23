@@ -67,7 +67,16 @@
     <ClCompile Include="zthread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zlog.cpp">
+    <ClCompile Include="zdemuxtask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zavparam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zdecodetask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zavpacketlist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -103,6 +112,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zlog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zdemuxtask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zavparam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zdecodetask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zavpacketlist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

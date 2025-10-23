@@ -1,5 +1,14 @@
 #include "zformat.h"
 #include "utils.h"
+#include "zavparam.h"
+
+static int TimeoutCallback(void* pParam) {
+    ZFormat* pFormat = (ZFormat*)pParam;
+    if (pFormat->IsTimeout()) {
+        return 1;
+    }
+    return 0;
+}
 
 bool ZFormat::CopyParam(int iStreamIndex, AVCodecParameters* dstParameter) {
     std::unique_lock<std::mutex> lock(m_mutex);
@@ -23,6 +32,20 @@ bool ZFormat::CopyParam(int iStreamIndex, AVCodecContext* dstCodecCtx) {
     return avcodec_parameters_to_context(dstCodecCtx, m_pFormatCtx->streams[iStreamIndex]->codecpar) >= 0;
 }
 
+std::shared_ptr<ZAVParam> ZFormat::CopyVideoParam() {
+    int iVideoStreamIdx = GetVideoIndex();
+    std::shared_ptr<ZAVParam> pAVParam;
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (iVideoStreamIdx < 0 || m_pFormatCtx == nullptr) {
+        return pAVParam;
+    }
+    pAVParam.reset(ZAVParam::CreateAVParam());
+    *pAVParam->pTimebase = m_pFormatCtx->streams[iVideoStreamIdx]->time_base;
+    avcodec_parameters_copy(pAVParam->pParam, m_pFormatCtx->streams[iVideoStreamIdx]->codecpar);
+
+    return pAVParam;
+}
+
 void ZFormat::SetFormatContext(AVFormatContext* pFormatCtx) {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_pFormatCtx) {
@@ -42,7 +65,16 @@ void ZFormat::SetFormatContext(AVFormatContext* pFormatCtx) {
     m_pFormatCtx = pFormatCtx;
 
     if (m_pFormatCtx == nullptr) {
+        m_bIsConnected = false;
         return;
+    }
+    m_bIsConnected = true;
+
+    m_lLastTime = Utils::GetCurrentTimestamp();
+    // 设置超时处理回调函数
+    if (m_iTimeoutMs > 0) {
+        AVIOInterruptCB cb = { TimeoutCallback, this };
+        m_pFormatCtx->interrupt_callback = cb;
     }
 
     for (int i = 0; i < pFormatCtx->nb_streams; ++i) {
@@ -97,4 +129,27 @@ bool ZFormat::RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, ZRationa
 int ZFormat::GetVideoCodecId() {
 
     return m_iVideoCodecId;
+}
+
+void ZFormat::SetTimeoutMs(int iTime) {
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_iTimeoutMs = iTime;
+    // 设置回调函数 处理超时退出
+    if (m_pFormatCtx != nullptr) {
+        AVIOInterruptCB cb = { TimeoutCallback, this };
+        m_pFormatCtx->interrupt_callback = cb;
+    }
+}
+
+bool ZFormat::IsTimeout() {
+    if (Utils::GetCurrentTimestamp() - m_lLastTime > m_iTimeoutMs) {
+        m_lLastTime = Utils::GetCurrentTimestamp();
+        m_bIsConnected = false;
+        return true;
+    }
+    return false;
+}
+
+bool ZFormat::IsConnected() {
+    return m_bIsConnected;
 }

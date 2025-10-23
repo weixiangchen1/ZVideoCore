@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <mutex>
+
+class ZAVParam;
 struct AVPacket;
 struct AVFormatContext;
 struct AVCodecContext;
@@ -20,6 +22,11 @@ public:
     // @return 成功返回true 失败返回false
     bool CopyParam(int iStreamIndex, AVCodecParameters* dstParameter);
     bool CopyParam(int iStreamIndex, AVCodecContext* dstCodecCtx);
+
+    /////////////////////////////////////////////////
+    // 复制视频参数 (线程安全)
+    // @return 返回视频参数的智能指针
+    std::shared_ptr<ZAVParam> CopyVideoParam();
 
     /////////////////////////////////////////////////
     // 设置封装或解封装上下文 (线程安全)
@@ -52,7 +59,25 @@ public:
     // @return 视频编码器ID
     int GetVideoCodecId();
 
+    /////////////////////////////////////////////////
+    // 设置超时时间
+    // @para iTime 超时时间
+    void SetTimeoutMs(int iTime);
+
+    /////////////////////////////////////////////////
+    // 判断是否超时
+    // @return 超时返回true 未超时返回false
+    bool IsTimeout();
+
+    /////////////////////////////////////////////////
+    // 判断是否连接成功
+    // @return 连接成功返回true 失败返回false
+    bool IsConnected();
+
 protected:
+    int m_iTimeoutMs = 0;                   // 超时时间
+    long long m_lLastTime = 0;              // 上一次接收到数据的时间
+    bool m_bIsConnected = false;            // 是否连接成功
     AVFormatContext* m_pFormatCtx;          // 封装和解封装上下文
     std::mutex m_mutex;
     int m_iVideoIndex = -1;                  // 视频流索引

@@ -6,6 +6,7 @@
 // 视频渲染接口类
 // 1.隐藏SDL实现 2.渲染方案可替代 3.线程安全
 struct AVFrame;
+struct AVCodecParameters;
 class ZVideoView {
 public:
     // VideoFormat枚举值与ffmpeg的AVPixelFormat一致
@@ -34,6 +35,7 @@ public:
     // @para eFormat 渲染格式
     // @return 是否初始化创建成功
     virtual bool Init(int iWidth, int iHeight, VideoFormat eFormat = VideoFormat::RGBA) = 0;
+    virtual bool Init(AVCodecParameters* pAVParam);
 
     /////////////////////////////////////////////////////////
     // 渲染图像 (线程安全)
