@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/black.png</file>
+        <file>res/siamese.png</file>
+        <file>res/wqy-microhei.ttc</file>
+        <file>res/cam.png</file>
+        <file>res/close.png</file>
+        <file>res/max.png</file>
+        <file>res/min.png</file>
+        <file>res/normal.png</file>
+    </qresource>
+</RCC>

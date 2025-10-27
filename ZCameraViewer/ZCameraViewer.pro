@@ -27,3 +27,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES +=
 DESTDIR = $$PWD/../../bin/x86
+
+RESOURCES += \
+  ZViewer.qrc
