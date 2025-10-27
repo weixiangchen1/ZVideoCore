@@ -11,10 +11,12 @@ CONFIG += c++11
 include($$PWD/../ZCodec/ZCodec.pri)
 
 SOURCES += \
+    ZCameraConfig.cpp \
     main.cpp \
     ZViewerWidget.cpp
 
 HEADERS += \
+    ZCameraConfig.h \
     ZViewerWidget.h
 
 FORMS += \
