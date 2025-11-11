@@ -397,9 +397,9 @@ int main(int argc, char *argv[]) {
 
     //TestZFormat(strInFile, strOutFile, iBeginTime, iEndTime, iWidth, iHeight);
 
-    //TestZDemuxTask();
+    TestZDemuxTask();
 
-    TestZMuxTask();
+    // TestZMuxTask();
 
     return 0;
 }

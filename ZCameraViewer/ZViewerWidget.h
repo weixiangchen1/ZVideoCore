@@ -8,6 +8,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class ZViewerWidget; }
 QT_END_NAMESPACE
 
+class ZCameraWidget;
 class ZViewerWidget : public QWidget {
     Q_OBJECT
 public:
@@ -15,7 +16,10 @@ public:
     ~ZViewerWidget();
     void SetupUI();
     void CreateViewWindow(int iWindowNum);
+    void RefreshCamera();
+    void EditCamera(int index);
 
+protected:
     // 鼠标事件 拖动窗口
     void mouseMoveEvent(QMouseEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
@@ -24,6 +28,8 @@ public:
     void resizeEvent(QResizeEvent* event) override;
     void contextMenuEvent(QContextMenuEvent* event) override;
 
+    void timerEvent(QTimerEvent* event) override;
+
 public slots:
     void slotMaxWindow();
     void slotRestoreWindow();
@@ -31,12 +37,15 @@ public slots:
     void slotViewFour();
     void slotViewNine();
     void slotViewSixteen();
+    void slotAddCamera();
+    void slotEditCamera();
+    void slotDeleteCamera();
 
 private:
     Ui::ZViewerWidget *ui;
     bool m_bMousePressed = false;
     QPoint m_pointMoveBefore;
     QMenu m_menu;
-    QVector<QWidget*> m_vecViews;
+    QVector<ZCameraWidget*> m_vecViews;
 };
 #endif // ZVIEWERWIDGET_H

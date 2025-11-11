@@ -11,6 +11,8 @@ SOURCES += \
     $$PWD/ZDecodeTask.cpp \
     $$PWD/ZMuxTask.cpp \
     $$PWD/ZDemuxTask.cpp \
+    $$PWD/ZVideoView.cpp \
+    $$PWD/ZSDLView.cpp \
 
 HEADERS += \
     $$PWD/ZCodec.h \
@@ -26,6 +28,8 @@ HEADERS += \
     $$PWD/Utils.h \
     $$PWD/ZLog.h \
     $$PWD/ZAVParam.h \
+    $$PWD/ZVideoView.h \
+    $$PWD/ZSDLView.h \
 
 INCLUDEPATH += $$PWD
 
