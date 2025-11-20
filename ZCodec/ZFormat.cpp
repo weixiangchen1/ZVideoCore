@@ -1,4 +1,4 @@
-#include "ZFormat.h"
+﻿#include "ZFormat.h"
 #include "Utils.h"
 #include "ZAVParam.h"
 
@@ -131,6 +131,10 @@ bool ZFormat::RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, ZRationa
 
 bool ZFormat::RescaleTimeParam(AVPacket* pPacket, long long lOffsetPts, AVRational* pTimeBase) {
     if (pPacket == nullptr || pTimeBase == nullptr) {
+        return false;
+    }
+    std::unique_lock<std::mutex> lock(m_mutex);
+    if (m_pFormatCtx == nullptr) {
         return false;
     }
     AVStream* pOutStream = m_pFormatCtx->streams[pPacket->stream_index];

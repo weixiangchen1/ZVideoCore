@@ -77,7 +77,7 @@ protected:
     int m_iTimeoutMs = 0;                   // 超时时间
     long long m_lLastTime = 0;              // 上一次接收到数据的时间
     bool m_bIsConnected = false;            // 是否连接成功
-    AVFormatContext* m_pFormatCtx;          // 封装和解封装上下文
+    AVFormatContext* m_pFormatCtx = nullptr;// 封装和解封装上下文
     std::mutex m_mutex;
     int m_iVideoIndex = -1;                  // 视频流索引
     int m_iAudioIndex = -1;                  // 音频流索引

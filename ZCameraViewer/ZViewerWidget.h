@@ -9,6 +9,7 @@ namespace Ui { class ZViewerWidget; }
 QT_END_NAMESPACE
 
 class ZCameraWidget;
+class ZCameraRecord;
 class ZViewerWidget : public QWidget {
     Q_OBJECT
 public:
@@ -31,15 +32,17 @@ protected:
     void timerEvent(QTimerEvent* event) override;
 
 public slots:
-    void slotMaxWindow();
-    void slotRestoreWindow();
-    void slotViewOne();
-    void slotViewFour();
-    void slotViewNine();
-    void slotViewSixteen();
-    void slotAddCamera();
-    void slotEditCamera();
-    void slotDeleteCamera();
+    void slotMaxWindow();       // 最大化窗口
+    void slotRestoreWindow();   // 还原窗口
+    void slotViewOne();         // 切换为1窗口视图
+    void slotViewFour();        // 切换为4窗口视图
+    void slotViewNine();        // 切换为9窗口视图
+    void slotViewSixteen();     // 切换为16窗口视图
+    void slotAddCamera();       // 添加相机配置
+    void slotEditCamera();      // 编辑相机配置
+    void slotDeleteCamera();    // 删除相机配置
+    void slotStartRecord();     // 启动所有摄像头录制
+    void slotStopRecord();      // 停止所以摄像头录制
 
 private:
     Ui::ZViewerWidget *ui;
@@ -47,5 +50,6 @@ private:
     QPoint m_pointMoveBefore;
     QMenu m_menu;
     QVector<ZCameraWidget*> m_vecViews;
+    QVector<ZCameraRecord*> m_vecRecorders;
 };
 #endif // ZVIEWERWIDGET_H

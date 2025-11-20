@@ -59,6 +59,10 @@ QPushButton#editCameraBtn:!hover {
 #textLabel {
 	color: white;
 }
+#recordStatusLabel {
+	color: rgb(255, 255, 255);
+	font: 11pt &quot;黑体&quot;;
+}
 #bodyWidget {
 	background-color: rgb(21, 21, 21);
 }
@@ -182,6 +186,19 @@ QPushButton#editCameraBtn:!hover {
     <zorder>minButton</zorder>
     <zorder>restoreButton</zorder>
     <zorder>maxButton</zorder>
+   </widget>
+   <widget class="QLabel" name="recordStatusLabel">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>15</y>
+      <width>261</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>监控录制中......</string>
+    </property>
    </widget>
   </widget>
   <widget class="QWidget" name="bodyWidget" native="true">

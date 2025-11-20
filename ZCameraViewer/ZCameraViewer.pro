@@ -12,12 +12,14 @@ include($$PWD/../ZCodec/ZCodec.pri)
 
 SOURCES += \
     ZCameraConfig.cpp \
+    ZCameraRecord.cpp \
     ZCameraWidget.cpp \
     main.cpp \
     ZViewerWidget.cpp
 
 HEADERS += \
     ZCameraConfig.h \
+    ZCameraRecord.h \
     ZCameraWidget.h \
     ZViewerWidget.h
 

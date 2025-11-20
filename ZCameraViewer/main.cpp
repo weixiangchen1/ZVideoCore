@@ -3,6 +3,8 @@
 #include <QApplication>
 #include <QIcon>
 #include <QFontDatabase>
+#include <QDir>
+#include "ZCameraRecord.h"
 
 void LoadFont() {
     QFont font;
@@ -22,5 +24,13 @@ int main(int argc, char *argv[]) {
     ZViewerWidget w;
     LoadFont();
     w.show();
+//    QString strPath = "./video/0/";
+//    QDir dir;
+//    dir.mkpath(strPath);
+//    ZCameraRecord record;
+//    record.SetCameraUrl("rtsp://127.0.0.1:8554/test");
+//    record.SetSavePath(strPath);
+//    record.Start();
+
     return a.exec();
 }

@@ -29,6 +29,6 @@ protected:
 private:
     std::mutex m_mutex;
     std::thread m_thread;
-    ZThread* m_pNext;       // 责任链的下一个结点
+    ZThread* m_pNext = nullptr;       // 责任链的下一个结点
 };
 

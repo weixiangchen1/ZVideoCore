@@ -11,10 +11,12 @@
 #include <QLineEdit>
 #include <QDialog>
 #include <QMessageBox>
+#include <QDir>
 #include <QDebug>
 
 #include "ZCameraConfig.h"
 #include "ZCameraWidget.h"
+#include "ZCameraRecord.h"
 
 #define TOUTF8(str) QString::fromLocal8Bit(str)
 
@@ -56,6 +58,10 @@ void ZViewerWidget::SetupUI() {
     connect(pNineViewAction, &QAction::triggered, this, &ZViewerWidget::slotViewNine);
     QAction* pSixteenViewAction = pSubMenu->addAction(TOUTF8("16窗口"));
     connect(pSixteenViewAction, &QAction::triggered, this, &ZViewerWidget::slotViewSixteen);
+    QAction* pStartRecordAction = m_menu.addAction(TOUTF8("开始录制"));
+    connect(pStartRecordAction, &QAction::triggered, this, &ZViewerWidget::slotStartRecord);
+    QAction* pStopRecordAction = m_menu.addAction(TOUTF8("停止录制"));
+    connect(pStopRecordAction, &QAction::triggered, this, &ZViewerWidget::slotStopRecord);
 
     m_vecViews.fill(nullptr, 16);
     CreateViewWindow(9);
@@ -63,6 +69,7 @@ void ZViewerWidget::SetupUI() {
     ZCameraConfig::GetInstance()->LoadConfig("config.json");
     RefreshCamera();
 
+    ui->recordStatusLabel->setText(TOUTF8("请右键菜单启动录制"));
     // 启动定时器渲染视频
     startTimer(1);
 }
@@ -261,5 +268,38 @@ void ZViewerWidget::slotDeleteCamera() {
     ZCameraConfig::GetInstance()->DeleteCameraData(index);
     ZCameraConfig::GetInstance()->SaveConfig("config.json");
     RefreshCamera();
+}
+
+void ZViewerWidget::slotStartRecord() {
+    slotStopRecord();
+    qDebug() << "start record";
+    ui->recordStatusLabel->setText(TOUTF8("监控录制中......"));
+    // 获取配置列表 开启录制线程
+    auto pConfig = ZCameraConfig::GetInstance();
+    for (int i = 0; i < pConfig->GetCameraCount(); ++i) {
+        ZCameraData data = pConfig->GetCameraData(i);
+        QString strPath = data.strSavePath;
+        strPath += "/";
+        strPath += QString::number(i);
+        strPath += "/";
+        QDir dir;
+        dir.mkpath(strPath);
+        ZCameraRecord* pRecorder = new ZCameraRecord();
+        pRecorder->SetCameraUrl(data.strSubURL);
+        pRecorder->SetSavePath(strPath);
+        pRecorder->SetFileSec(5);
+        pRecorder->Start();
+        m_vecRecorders.push_back(pRecorder);
+    }
+}
+
+void ZViewerWidget::slotStopRecord() {
+    qDebug() << "stop record";
+    ui->recordStatusLabel->setText(TOUTF8("监控录制停止"));
+    for (auto recorder: m_vecRecorders) {
+        recorder->Stop();
+        delete recorder;
+    }
+    m_vecRecorders.clear();
 }
 

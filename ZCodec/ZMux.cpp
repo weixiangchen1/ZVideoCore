@@ -1,4 +1,4 @@
-#include "ZMux.h"
+﻿#include "ZMux.h"
 #include "Utils.h"
 
 ZMux::ZMux() {}
@@ -26,15 +26,15 @@ AVFormatContext* ZMux::CreateMuxContext(const char* strURL, AVCodecParameters* p
     }
 
     // 添加音频流和视频流
-    if (pVideoParam != nullptr) {
-        AVStream* pVideoStream = avformat_new_stream(pFormatCtx, nullptr);   // 视频流
-        pVideoStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
-        avcodec_parameters_copy(pVideoStream->codecpar, pVideoParam);
-    }
     if (pAudioParam != nullptr) {
         AVStream* pAudioStream = avformat_new_stream(pFormatCtx, nullptr);   // 音频流
         pAudioStream->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
         avcodec_parameters_copy(pAudioStream->codecpar, pAudioParam);
+    }
+    if (pVideoParam != nullptr) {
+        AVStream* pVideoStream = avformat_new_stream(pFormatCtx, nullptr);   // 视频流
+        pVideoStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
+        avcodec_parameters_copy(pVideoStream->codecpar, pVideoParam);
     }
 
     // 打开输出IO
